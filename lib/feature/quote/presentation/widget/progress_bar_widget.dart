@@ -10,7 +10,7 @@ class ProgressBar extends StatelessWidget {
           child: CircularProgressIndicator(
         backgroundColor: Colors.greenAccent,
       )),
-      backgroundColor: Colors.limeAccent,
+      backgroundColor: Colors.white60,
     );
   }
 }

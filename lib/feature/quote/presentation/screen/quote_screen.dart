@@ -12,20 +12,19 @@ import 'package:flutter_share_me/flutter_share_me.dart';
 
 class QuoteScreen extends StatelessWidget {
   QuoteScreen({super.key});
-  String? quote = '';
+
 
   @override
   Widget build(BuildContext context) {
+    String? quote = '';
     return Scaffold(
       body: BlocBuilder<QuoteBloc, QuoteState>(
         builder: (context, state) {
-          if (state is QuoteInitialState) {
-            return const ProgressBar();
-          } else if (state is QuoteLoadingState) {
-            return const ProgressBar();
-          } else if (state is QuoteLoadedState) {
-            quote = state.quoteData.content;
-            return quoteUI(context, quote!);
+          if ((state is QuoteInitialState) || (state is QuoteLoadingState) || (state is QuoteLoadedState)) {
+            if (state is QuoteLoadedState) {
+              quote = state.quoteData.content;
+            }
+            return quoteUI(context,state, quote: quote);
           } else if (state is QuoteErrorState) {
             if (state.error == AppStrings.noInternetError) {
               return noInternetLayout(context, state.message);
@@ -38,7 +37,7 @@ class QuoteScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => onShareQuoteBtnTap(Share.twitter, quote ?? "text"),
+        onPressed: () => onShareQuoteBtnTap(Share.twitter, quote ?? ""),
         child: const Icon(
           FontAwesomeIcons.twitter,
           color: Colors.black,
@@ -48,19 +47,19 @@ class QuoteScreen extends StatelessWidget {
   }
 }
 
-Widget quoteUI(BuildContext context, String quote) {
+Widget quoteUI(BuildContext context, QuoteState state, {String? quote}) {
   return Container(
     decoration: BoxDecoration(
       color: getRandomBackgroundColor(),
     ),
-    child: Column(
+    child: state is QuoteLoadedState? Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         const SizedBox(height: AppStrings.vertical1),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppStrings.vertical1),
           child: Text(
-            quote,
+            quote ?? '',
             style: Theme.of(context).textTheme.labelMedium,
             textAlign: TextAlign.center,
           ),
@@ -77,7 +76,7 @@ Widget quoteUI(BuildContext context, String quote) {
                 child: Text(AppStrings.nextQuote,
                     style: Theme.of(context).textTheme.labelMedium))),
       ],
-    ),
+    ) : const ProgressBar(),
   );
 }
 
